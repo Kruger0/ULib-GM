@@ -1,2 +1,2 @@
 # ULib-GM
- Gamemaker Gerenal Library
+ Gamemaker General Library
