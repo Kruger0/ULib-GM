@@ -1,0 +1,52 @@
+{
+  "resourceType": "GMProject",
+  "resourceVersion": "1.7",
+  "name": "ULib",
+  "AudioGroups": [
+    {"resourceType":"GMAudioGroup","resourceVersion":"1.3","name":"audiogroup_default","targets":-1,},
+  ],
+  "configs": {
+    "children": [],
+    "name": "Default",
+  },
+  "defaultScriptType": 1,
+  "Folders": [
+    {"resourceType":"GMFolder","resourceVersion":"1.0","name":"ULib","folderPath":"folders/ULib.yy",},
+  ],
+  "IncludedFiles": [],
+  "isEcma": false,
+  "LibraryEmitters": [],
+  "MetaData": {
+    "IDEVersion": "2023.4.0.84",
+  },
+  "resources": [
+    {"id":{"name":"__scr_ulib_core","path":"scripts/__scr_ulib_core/__scr_ulib_core.yy",},},
+    {"id":{"name":"scr_ulib_shader","path":"scripts/scr_ulib_shader/scr_ulib_shader.yy",},},
+    {"id":{"name":"scr_ulib_pubsub","path":"scripts/scr_ulib_pubsub/scr_ulib_pubsub.yy",},},
+    {"id":{"name":"scr_ulib_file","path":"scripts/scr_ulib_file/scr_ulib_file.yy",},},
+    {"id":{"name":"scr_ulib_array","path":"scripts/scr_ulib_array/scr_ulib_array.yy",},},
+    {"id":{"name":"scr_ulib_vector","path":"scripts/scr_ulib_vector/scr_ulib_vector.yy",},},
+    {"id":{"name":"scr_ulib_string","path":"scripts/scr_ulib_string/scr_ulib_string.yy",},},
+    {"id":{"name":"scr_ulib_paths","path":"scripts/scr_ulib_paths/scr_ulib_paths.yy",},},
+    {"id":{"name":"scr_ulib_glsl","path":"scripts/scr_ulib_glsl/scr_ulib_glsl.yy",},},
+    {"id":{"name":"scr_ulib_collision","path":"scripts/scr_ulib_collision/scr_ulib_collision.yy",},},
+    {"id":{"name":"scr_ulib_matrix","path":"scripts/scr_ulib_matrix/scr_ulib_matrix.yy",},},
+    {"id":{"name":"scr_ulib_screen","path":"scripts/scr_ulib_screen/scr_ulib_screen.yy",},},
+    {"id":{"name":"scr_ulib_3D","path":"scripts/scr_ulib_3D/scr_ulib_3D.yy",},},
+    {"id":{"name":"scr_ulib_audio","path":"scripts/scr_ulib_audio/scr_ulib_audio.yy",},},
+    {"id":{"name":"scr_ulib_draw","path":"scripts/scr_ulib_draw/scr_ulib_draw.yy",},},
+    {"id":{"name":"scr_ulib_math","path":"scripts/scr_ulib_math/scr_ulib_math.yy",},},
+    {"id":{"name":"scr_ulib_camera","path":"scripts/scr_ulib_camera/scr_ulib_camera.yy",},},
+    {"id":{"name":"scr_ulib_binary","path":"scripts/scr_ulib_binary/scr_ulib_binary.yy",},},
+    {"id":{"name":"scr_ulib_debug","path":"scripts/scr_ulib_debug/scr_ulib_debug.yy",},},
+    {"id":{"name":"scr_ulib_localize","path":"scripts/scr_ulib_localize/scr_ulib_localize.yy",},},
+    {"id":{"name":"scr_ulib_depthsort","path":"scripts/scr_ulib_depthsort/scr_ulib_depthsort.yy",},},
+    {"id":{"name":"rm_game","path":"rooms/rm_game/rm_game.yy",},},
+  ],
+  "RoomOrderNodes": [
+    {"roomId":{"name":"rm_game","path":"rooms/rm_game/rm_game.yy",},},
+  ],
+  "TextureGroups": [
+    {"resourceType":"GMTextureGroup","resourceVersion":"1.3","name":"Default","autocrop":true,"border":2,"compressFormat":"bz2","directory":"","groupParent":null,"isScaled":true,"loadType":"default","mipsToGenerate":0,"targets":-1,},
+  ],
+}
