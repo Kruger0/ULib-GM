@@ -1,7 +1,7 @@
 {
   "resourceType": "GMScript",
   "resourceVersion": "1.0",
-  "name": "scr_ulib_screen",
+  "name": "scr_ulib_json",
   "isCompatibility": false,
   "isDnD": false,
   "parent": {

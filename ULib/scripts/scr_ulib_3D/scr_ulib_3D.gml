@@ -1,4 +1,5 @@
 
+
 vertex_format_begin()
 vertex_format_add_position_3d()
 vertex_format_add_texcoord()
@@ -230,16 +231,6 @@ function draw_sprite_billboard(_spr, _subimg, _x, _y, _z, _scale = 1) {
 	shader_reset()
 }
 
-
-function matrix_reset() {
-	static identity = matrix_build_identity()
-	matrix_set(matrix_world, identity)
-}
-
-
-function matrix_set_world(_x, _y, _z, _xrot = 0, _yrot = 0, _zrot = 0, _xscal = 1, _yscal = 1, _zscal = 1) {
-	matrix_set(matrix_world, matrix_build(_x, _y, _z, _xrot, _yrot, _zrot, _xscal, _yscal, _zscal))
-}
 
 
 function gpu_3d_start(_ztest = true, _zwrite = true, _cullmode = cull_counterclockwise) {
@@ -760,30 +751,7 @@ function model_set_material(_material) {
 	shader_set_uniform_f(shader_get_uniform(shd_gbuff_main, "u_material_type"), _material);
 }
 
-function matrix_reset() {
-	static identity = matrix_build_identity()
-	matrix_set(matrix_world, identity)
-}
-	
-function matrix_build_srt(_x, _y, _z, _xrot, _yrot, _zrot, _xscale, _yscale, _zscale) {
-	
-	var _mat_t = matrix_build(_x, _y, _z,	0, 0, 0,				1, 1, 1);
-	var _mat_r = matrix_build(0, 0, 0,		_xrot, _yrot, _zrot,	1, 1, 1);
-	var _mat_s = matrix_build(0, 0, 0,		0, 0, 0,				_xscale, _yscale, _zscale);
-	
-	var _mat_rs = matrix_multiply(_mat_s, _mat_r)
-	var _mat_srt = matrix_multiply(_mat_rs, _mat_t)
-	return _mat_srt;
-}
 
-function matrix_transform_vertex_array(_mat, _array) {
-	if (array_length(_array) < 4) {
-		var _w = 1
-	} else {
-		var _w = _array[3]
-	}
-	return matrix_transform_vertex(_mat, _array[0], _array[1], _array[2], _w)
-}
 
 function model_calculate_normals(_vbo) {
 	var _buffer = buffer_create_from_vertex_buffer(_vbo, buffer_fixed, 1)
