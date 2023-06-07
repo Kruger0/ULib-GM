@@ -1,4 +1,4 @@
-
+//https://github.com/FoxyOfJungle/TurboGML/blob/main/scripts/__tgm_core/__tgm_core.gml
 
 function distance_to_path(xx, yy, path) {
 	// calculates the shortest distance to the given path

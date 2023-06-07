@@ -1,5 +1,5 @@
 
-
+// TODO: use screen space depthsort method
 
 global.__depthsort_reference_layer_id = -1
 #macro __DS_LAYER_INTERVAL 5000

@@ -1,8 +1,6 @@
 
-
-
-// Pubsub Manager Script File
-
+// Created by SamSpadeGamedev
+//https://www.youtube.com/shorts/MX0yhlJ52hI
 
 enum ps_event {
 	inst_id,

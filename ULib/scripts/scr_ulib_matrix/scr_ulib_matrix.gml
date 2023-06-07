@@ -1,26 +1,23 @@
 
+// TODO: add more fun functions like transpose, inverse etc...
 
-///@func matrix_print_pretty(matrix)
-function matrix_print_pretty(_m) {
-	return string(
-		"\n"+
-		"[{0}, {1}, {2}, {3}]\n"+
-		"[{4}, {5}, {6}, {7}]\n"+
-		"[{8}, {9}, {10}, {11}]\n"+
-		"[{12}, {13}, {14}, {15}]",
-		_m[0], _m[1], _m[2], _m[3],
-		_m[4], _m[5], _m[6], _m[7],
-		_m[8], _m[9], _m[10], _m[11],
-		_m[12], _m[13], _m[14], _m[15],
-	)
+///@func matrix_print_pretty(matrix, min_int, min_dec)
+function matrix_print_pretty(_m, _i = 1, _d = 2) {
+	static pad = function(n, i, d) {
+		return string_replace_all(string_format(n, i, d), " ", "0")
+	}
+	
+	var _str = "";
+	for (var i = 0; i < 16; i++) {
+		_str += pad(_m[i], _i, _d);
+		if (i < 16) _str += ", ";
+		if (i mod 4 == 3) _str += "\n";
+	}
+	
+	return _str
 }
 
-
-
-function matrix_reset() {
-	static identity = matrix_build_identity()
-	matrix_set(matrix_world, identity)
-}
+show_debug_message(matrix_print_pretty(matrix_build_identity(), 3, 3))
 
 
 function matrix_set_world(_x, _y, _z, _xrot = 0, _yrot = 0, _zrot = 0, _xscal = 1, _yscal = 1, _zscal = 1) {

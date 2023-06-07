@@ -1,5 +1,5 @@
 
-
+// Default vertex format used bu ULib-GM. TODO: make it private
 vertex_format_begin()
 vertex_format_add_position_3d()
 vertex_format_add_texcoord()
@@ -15,7 +15,6 @@ function vertex_add_point(_vbuff, _x, _y, _z, _u, _v, _col = c_white, _alpha = 1
 	vertex_color(_vbuff, _col, _alpha)
 }
 
-
 function vertex_add_face(_vbuff, _pos1, _pos2, _pos3, _pos4, _uvs, _col = c_white, _a = 1) {
 	vertex_add_point(_vbuff, _pos1[0], _pos1[1], _pos1[2], _uvs[0], _uvs[1], _col, _a)
 	vertex_add_point(_vbuff, _pos2[0], _pos2[1], _pos2[2], _uvs[2], _uvs[1], _col, _a)
@@ -25,7 +24,6 @@ function vertex_add_face(_vbuff, _pos1, _pos2, _pos3, _pos4, _uvs, _col = c_whit
 	vertex_add_point(_vbuff, _pos4[0], _pos4[1], _pos4[2], _uvs[2], _uvs[3], _col, _a)
 	vertex_add_point(_vbuff, _pos3[0], _pos3[1], _pos3[2], _uvs[0], _uvs[3], _col, _a)
 }
-
 
 function vertex_create_model(_spr, _subimg = 0, _col = c_white, _a = 1, _clockwise = true) {
 	
@@ -133,7 +131,6 @@ function vertex_build_cube(x1, y1, z1, x2, y2, z2, hrepeat, vrepeat, color=c_whi
 	return _vbuff
 };
 	
-
 function world_to_screen(_x, _y, _z, _view_mat, _proj_mat) {
 	var _cx, _cy
 	if (_proj_mat[15] == 0) {   //This is a perspective projection
@@ -158,7 +155,6 @@ function world_to_screen(_x, _y, _z, _view_mat, _proj_mat) {
 		y : (0.5 - 0.5 * _cy) * window_get_height()
 	};
 }
-
 
 function screen_to_world_dimension(view_mat, proj_mat, xx, yy) {
 	// credits: TheSnidr
@@ -189,7 +185,6 @@ function screen_to_world_dimension(view_mat, proj_mat, xx, yy) {
 	var _yy = _matrix[1] * _matrix[5] / -_matrix[2] + _matrix[4];
 	return new Vector3(_xx, _yy, camera_get_near_plane(proj_mat));
 }
-
 
 function screen_to_ray(view_mat, proj_mat, xx, yy) {
 	// credits: TheSnidr / DragoniteSpam / FoxyOfJungle
@@ -222,23 +217,11 @@ function screen_to_ray(view_mat, proj_mat, xx, yy) {
 	}
 }
 
-
-function draw_sprite_billboard(_spr, _subimg, _x, _y, _z, _scale = 1) {
-	shader_set(shd_billboard)
-		matrix_set(matrix_world, matrix_build(_x, _y, _z, 0, 0, 0, _scale, _scale, 1))
-			draw_sprite(_spr, _subimg, 0, 0)
-		matrix_set(matrix_world, matrix_build_identity())
-	shader_reset()
-}
-
-
-
 function gpu_3d_start(_ztest = true, _zwrite = true, _cullmode = cull_counterclockwise) {
 	gpu_set_ztestenable(_ztest)
 	gpu_set_zwriteenable(_zwrite)
 	gpu_set_cullmode(_cullmode)
 }
-
 
 function gpu_3d_end() {
 	gpu_set_ztestenable(false)
@@ -246,6 +229,194 @@ function gpu_3d_end() {
 	gpu_set_cullmode(cull_noculling)
 }
 
+///@desc Loads a .obj file from a path and stores it in a struct.
+///@arg {string} file_name The name of the file to read from.
+///@arg {real} model_matrix A matrix to use for transforming the vertexes and normals.
+///@arg {bool} freeze If ths vertex buffer should be freezed or not.
+///@return {struct} Returns a struct containing the VBO variables and methods.
+function load_obj(_file_name, _model_matrix = -1, _freeze = false) {	
+	static quad_order	= [[1, 4, 2], [2, 4, 3]];
+	static def_color	= [1, 1, 1];
+	
+	static build_vertex = function(_vbo, _fdata, _v, _vc, _vt, _vn, _mtl) {
+		var _f		= string_split(_fdata, "/")
+		var _flen	= array_length(_f)
+		var _fv		= _v[_f[0]-1]
+		var _fvc	= _vc[_f[0]-1]
+		var _fvt	= _flen > 1 ? (_f[1] != "" ? _vt[_f[1]-1] : [0, 0]) : [0, 0]
+		var _fvn	= (_flen > 2 ? _vn[_f[2]-1] : [0, 0, -1]) // default normals facing up		
+		var _diff	= _mtl.diffuse
+		var _ffc	= (_fvc[0] * _diff[0] * 255) | (_fvc[1] * _diff[1] * 255) << 8 | (_fvc[2] * _diff[2] * 255) << 16					
+		vertex_add_point(_vbo, _fv[0], _fv[1], _fv[2], _fvt[0], 1-_fvt[1], _ffc, 1, _fvn[0], _fvn[1], _fvn[2])
+	}
+	static model = function(_vbo, _name) constructor {
+		vbo = _vbo
+		name = _name
+		frozed = false
+		frozed_vbo = -1
+		
+		///@func freeze()
+		static freeze = function() {
+			if (frozed) return
+			frozed = true
+			var _buff = buffer_create_from_vertex_buffer(vbo, buffer_grow, 1)
+			frozed_vbo = vertex_create_buffer_from_buffer(_buff, VFORMAT)
+			buffer_delete(_buff)
+			vertex_freeze(frozed_vbo)
+			show_debug_message($"ObjLoader: vertex buffer \"{name}\" successfully freeze.")
+		}
+		///@func submit([texture])
+		static submit = function(_texture = -1) {
+			if (vbo == -1) {
+				show_debug_message($"ObjLoader error: coudn't submit vertex buffer from file \"{name}\".")
+				return
+			}
+			vertex_submit(frozed ? frozed_vbo : vbo, pr_trianglelist, _texture)
+		}
+	}
+	static material = function(_diffuse, _texture) constructor {
+		diffuse = _diffuse
+		texture = _texture
+	}
+
+	// Get the file path separated from file name
+	var _path_arr = string_split(_file_name, "/")
+	var _path = ""
+	for (var i = 0, n = array_length(_path_arr)-1; i < n; i++) {
+		_path += _path_arr[i] + "/"
+	}
+	
+	
+	var _file = file_text_open_read(_file_name)
+	if !(_file) {
+		show_debug_message($"ObjLoader error: coudn't load object from file \"{_file_name}\".")
+		return new model(-1, _file_name);
+	}
+	
+	var _mtl = -1
+	var _current_obj = ""
+	var _mtl_list = {}
+	var _current_mtl = {diffuse : [1, 1, 1]}
+	var _v	= []
+	var _vt = []
+	var _vn = []
+	var _vc = []	
+	var _vbo = vertex_create_buffer()
+	vertex_begin(_vbo, VFORMAT)
+	
+	while (!file_text_eof(_file)) {
+		var _line_str = file_text_readln(_file)
+		var _splits = string_split(_line_str, " ") // Split lines into separated elements
+		switch (_splits[0]) {
+			case "mtllib": { // Load material lib data
+				_mtl = file_text_open_read(_path+string_replace(_splits[1], "\n", ""))
+				var _temp_mtl_name = ""
+				while (!file_text_eof(_mtl)) {
+					var _line_mtl = file_text_readln(_mtl)
+					var _splits_mtl = string_split(_line_mtl, " ")				
+
+					switch (_splits_mtl[0]) {
+						case "newmtl": {
+							// Save current material name
+							_temp_mtl_name = string_replace(_splits_mtl[1], "\n", "")
+							// Add new material to the list
+							_mtl_list[$ _temp_mtl_name] = {diffuse : [1, 1, 1]}
+						} break;
+						case "Kd": {
+							// Get material diffuse color
+							var _gamma_fac = 1/2.2
+							_mtl_list[$ _temp_mtl_name].diffuse = [
+								power(real(_splits_mtl[1]), _gamma_fac), 
+								power(real(_splits_mtl[2]), _gamma_fac), 
+								power(real(_splits_mtl[3]), _gamma_fac)
+							]
+						} break;
+						case "map_Kd": {
+							// Get material texture
+						} break;
+					}
+				}
+				file_text_close(_mtl)
+			} break;
+			
+			case "o": { // Object data
+				// Resets material for each object
+				_current_obj = string_replace(string_concat_ext(_splits, 1), "\n", "")
+				_current_mtl = {diffuse : [1, 1, 1]}
+			} break;
+			
+			case "v": { // Vertex position
+				var _x = _splits[1]
+				var _y = _splits[2]
+				var _z = _splits[3]
+				var _vertexes = [_x, _y, _z]
+				
+				if (is_array(_model_matrix)) {
+					_vertexes = matrix_transform_vertex(_model_matrix, _x, _y, _z)
+				}
+				
+				array_push(_v, _vertexes)
+				
+				// If it has vertex color, multiply it by diffuse color
+				// If not, multiply default color (white) by diffuse color
+				if (array_length(_splits) > 4) {
+					array_push(_vc, [real(_splits[4]), real(_splits[5]), real(_splits[6])])
+				} else {
+					array_push(_vc, [def_color[0], def_color[1], def_color[2]])
+				}
+			} break;
+			
+			case "vt": { // Vertex texcoord
+				array_push(_vt, [_splits[1], _splits[2]])
+			} break;
+
+			case "vn": { // Vertex normal				
+				var _x = _splits[1]
+				var _y = _splits[2]
+				var _z = _splits[3]
+				var _normal = [_x, _y, _z]
+				
+				if (is_array(_model_matrix)) {
+					_normal = matrix_transform_vertex(_model_matrix, _x, _y, _z)
+				}
+				
+				array_push(_vn, _normal)
+			} break;
+			
+			case "usemtl": { // Material data
+				var _mtl_name = string_replace(_splits[1], "\n", "")
+				_current_mtl = _mtl_list[$ _mtl_name]
+
+			} break;
+			
+			case "f": { // Build face				
+				if (array_length(_splits) > 4) { // Quad
+					for (var j = 0; j < 2; j++) {						
+						for (var i = 0; i < 3; i++) {
+							var _fdata	= _splits[quad_order[j][i]]
+							build_vertex(_vbo, _fdata, _v, _vc, _vt, _vn,_current_mtl)
+						}
+					}				
+				} else { // Tri
+					for (var i = 2; i >= 0; i--) {
+						var _fdata	= _splits[i+1]
+						build_vertex(_vbo, _fdata, _v, _vc, _vt, _vn, _current_mtl)
+					}
+				}
+			} break;
+		}
+	}
+	
+	file_text_close(_file)
+	
+	var _model = new model(_vbo, _file_name);
+	vertex_end(_vbo)
+	if (_freeze) {
+		_model.freeze()
+	}
+	
+	return _model;
+}
 
 
 

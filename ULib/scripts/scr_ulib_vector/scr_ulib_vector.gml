@@ -105,10 +105,14 @@ function Vector2(_x = 0, _y = _x) constructor {
 		}
 		return self;
 	}
-	static SetMagnitude = function(_scalar) {
-		Normalize();
-		Multiply(_scalar);
-		return self;
+	static SetMagnitude = function() {
+		if (instanceof(self) == "Vector2") {
+			Normalize();
+			Multiply(argument[0]);
+			return self;
+		} else {
+			return new Vector3(argument[0]).SetMagnitude(argument[1]);
+		}		
 	}	
 	static SetDirection = function(_dir) {
 		var _mag = GetMagnitude()
@@ -183,7 +187,6 @@ function Vector2(_x = 0, _y = _x) constructor {
 	}
 }
 
-
 ///@func Vector3([x], [y], [z])
 function Vector3(_x = 0, _y = 0, _z = 0) constructor {
 	x = _x;
@@ -215,10 +218,14 @@ function Vector3(_x = 0, _y = 0, _z = 0) constructor {
 		z = 0;
 	}
 	static Negate = function() {
-		x = -x;
-		y = -y;
-		z = -z;
-		return self;
+		if (instanceof(self) == "Vector3") {
+			x = -x;
+			y = -y;
+			z = -z;
+			return self;
+		} else {
+			return new Vector3(-argument[0].x, -argument[0].y, -argument[0].z)
+		}		
 	}
 	static Add = function(_vector) {
 		if (instanceof(self) == "Vector3") {
@@ -265,7 +272,11 @@ function Vector3(_x = 0, _y = 0, _z = 0) constructor {
 		return point_distance_3d(_vector.x, _vector.y, _vector.z, x, y, z)
 	}
 	static GetMagnitude = function() {
-		return sqrt((x * x) + (y * y) + (z * z));
+		if (instanceof(self) == "Vector3") {
+			return sqrt((x * x) + (y * y) + (z * z));
+		} else {
+			return 
+		}
 	}
 	static GetYaw = function() {
 		return point_direction(0, 0, x, y);
@@ -277,30 +288,43 @@ function Vector3(_x = 0, _y = 0, _z = 0) constructor {
 		return point_direction(0, 0, x, z);
 	}
 	static Normalize = function() {
-		if ((x != 0) || (y != 0)) {
-			var _factor = GetMagnitude();
-			x /= _factor;
-			y /= _factor;
-			z /= _factor;
+		if (instanceof(self) == "Vector3") {
+			if ((x != 0) || (y != 0)) {
+				var _factor = GetMagnitude();
+				x /= _factor;
+				y /= _factor;
+				z /= _factor;
+			}
+			return self;
+		} else {
+			return new Vector3(argument[0].x, argument[0].y, argument[0].z).Normalize()
 		}
+	}
+	static Transform = function() {
+		var _v = matrix_transform_vertex(argument[0], x, y, z)
+		x = _v[0]
+		y = _v[1]
+		z = _v[2]
 		return self;
 	}
-	static SetMagnitude = function(_scalar) {
-		Normalize();
-		Multiply(_scalar);
+	static Rotate = function() {
+		var _m = matrix_build(0, 0, 0, argument[0], argument[1], argument[2], 1, 1, 1)
+		var _v = matrix_transform_vertex(_m, x, y, z)
+		x = _v[0]
+		y = _v[1]
+		z = _v[2]
 		return self;
-	}	
-	static SetYaw = function(_ang) {
-		var _mag = GetMagnitude()
-		x =  dcos(_ang) * _mag
-		y = -dsin(_ang) * _mag
 	}
-	static SetPitch = function(_ang) {
-		var _mag = GetMagnitude()
-		x =  dcos(_ang) * _mag
-		y = -dsin(_ang) * _mag
+	static SetMagnitude = function() {
+		if (instanceof(self) == "Vector3") {
+			Normalize();
+			Multiply(argument[0]);
+			return self;
+		} else {
+			return new Vector3(argument[0]).SetMagnitude(argument[1]);
+		}		
 	}
-	static limit_magnitude = function(_limit) {
+	static LimitMagnitude = function(_limit) {
 		if (GetMagnitude() > _limit) {
 			SetMagnitude(_limit);
 		}
@@ -361,10 +385,13 @@ function Vector3(_x = 0, _y = 0, _z = 0) constructor {
 		}
 	}
 	static ToString = function() {
-		return {
-			x : x, 
-			y : y, 
-			z : z
+		return string("x: {0}, y: {1}, z: {2}", x, y, z)
+	}
+	static ToArray = function() {
+		if (instanceof(self) == "Vector3") {
+			return [x, y, z]
+		} else {
+			return [argument[0].x, argument[0].y, argument[0].z]
 		}
 	}
 }

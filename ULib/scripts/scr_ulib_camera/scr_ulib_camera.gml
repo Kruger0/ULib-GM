@@ -17,22 +17,10 @@ function camera_get_near_plane(proj_mat) {
 	return -2 * proj_mat[14] / (proj_mat[10]+1);
 }
 
-
-
-
 function display_get_aspect_ratio() {
 	return display_get_width() / display_get_height();
 }
 
-
-
-
-
-enum CamMode {
-	Free,
-	FollowPlayer,
-	Menu,
-}
 
 function Camera3D(_x, _y, _z, _xto, _yto, _zto, _xup, _yup, _zup, _fov, _aspect, _znear, _zfar) constructor {
 	pos = new Vector3(_x, _y, _z)
@@ -49,18 +37,6 @@ function Camera3D(_x, _y, _z, _xto, _yto, _zto, _xup, _yup, _zup, _fov, _aspect,
 	roll = 0
 	
 	id = camera_create();	
-	
-	mode = CamMode.Free
-	switch (mode) {
-		case CamMode.Free: {
-			update_method = UpdateFree
-		}
-		break;
-		case CamMode.FollowPlayer: {
-			update_method = UpdateFollow
-		}
-		break;
-	}
 	
 	static SetMode = function() {
 		if (keyboard_check_pressed(ord("C"))) {

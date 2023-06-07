@@ -1,68 +1,59 @@
 
-function bitmap_write(_map, _index, _bool) {
-    var _mask
+///@func bitmask_write(mask, index, bool)
+function bitmask_write(_mask, _index, _bool) {
     var _value = 1<<_index
     if (_bool) {
-        _mask = _map | _value
+        _mask |= _value
     } else {
-        _mask = _map & ~_value
+        _mask &= ~_value
     }
     return _mask
 }
 
-function bitmap_read(_map, _index) {
+///@func bitmask_read(mask, index)
+function bitmask_read(_mask, _index) {
     var _bitpos = 1<<_index
-    return (_map & _bitpos)>>_index
+    return (_mask & _bitpos)>>_index
 }
 
-function bitmap_array(_map, _minimum_size = 8) {
+///@func bitmask_array(mask, [min_size])
+function bitmask_array(_mask, _minimum_size = 8) {
     var _len
-    if (_map == 0) {
+    if (_mask == 0) {
         _len = _minimum_size
     } else {
-        _len = floor(log2(_map))+1    
+        _len = floor(log2(_mask))+1    
     }    
     var _arr = []
     for (var i = 0; i< _len; i++) {
-        _arr[i] = bitmap_read(_map, i)
+        _arr[i] = bitmask_read(_mask, i)
     }
     return _arr;
 }
 
+///@func bin_to_dec(string)
 function bin_to_dec(_string) {
-	//var _len = string_length(_string)
-	//var _result = 0
-	//for (var i = _len; i > 0; i--) {
-	//	var _bit = string_copy(_string, i, 1)
-	//	if 
-	//}
+	var _len = string_length(_string)
+	var _dec = 0;
+	for (var i = _len-1; i>= 0; i--) {
+		var _bit = string_copy(_string, i+1, 1)
+		if (real(_bit)) {
+			_dec += power(2, _len-i-1)
+		}
+	}
+	return _dec;
 }
 
-function dec_to_bin(_value, _min_size = 1) {
-	var _bin = ""
+///@func dec_to_bin(value, [gap_str])
+function dec_to_bin(_value, _gap_str = " ") {
 	var _val = _value
-
-	while (_val != 0) {
-		var _div= _val / 2
-		var _rem = ceil(frac(_div))
-		_val = floor(_div)
-		_bin += _rem ? "1" : "0"
-	}
-	
-	// revert the string
-	var _str = ""
-	var _len = string_length(_bin)
-	for (var i = max(_min_size, _len); i > 0; i--) {
-		if (i <= _len) {
-			_str += string_copy(_bin, i, 1)
-		} else {
-			_str += "0"
-		}
-		
-		if (i mod 4 == 1) {
-			_str += " "
-		}
-	}
-	
-	return _str
+	var _str = "";
+	var _n = 0
+    while (_val > 0) {
+        _str = ((floor(_val % 2)) == 0 ? "0" : "1") + _str;
+		_n = (_n+1) mod 4
+		if (!_n) _str = _gap_str + _str
+        _val = _val / 2;
+    }
+    return _str;
 }

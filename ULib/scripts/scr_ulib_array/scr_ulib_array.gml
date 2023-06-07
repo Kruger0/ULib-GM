@@ -22,7 +22,7 @@ function array_contains(_array, _value) {
     return _qtt;
 }
 
-
+///@func array_sort_custom(array)
 function array_sort_custom(_arr) {
     var _n = array_length(_arr)
     var _temp
