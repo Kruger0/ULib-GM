@@ -61,10 +61,6 @@ function vertex_create_model(_spr, _subimg = 0, _col = c_white, _a = 1, _clockwi
 	return _vbuffer
 }
 
-function vertex_create_two_planes() {
-	
-}
-
 function vertex_build_cube(x1, y1, z1, x2, y2, z2, hrepeat, vrepeat, color=c_white, alpha=1) {
 	var _vbuff = vertex_create_buffer();
 	
@@ -418,9 +414,9 @@ function load_obj(_file_name, _model_matrix = -1, _freeze = false) {
 	return _model;
 }
 
+//TODO: add spritestack_create() from an old project
 
-
-//---------
+//--------- since there is now a .obj load function there's no need to manually create complex primitives so anywaw
 
 /*
 
